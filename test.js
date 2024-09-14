@@ -1,26 +1,67 @@
+const solution = require('./solution');
 
-const solution = require('./solution');  
-
+// test data
 const instances = [
-    { name: 'instance0', installed: {} },
-    { name: 'instance1', installed: {} },
-    { name: 'instance2', installed: {} },
-    { name: 'instance3', installed: {} },
-    { name: 'instance4', installed: {} }
+    {
+        name: 'instance0',
+        installed: {}
+    },
+    {
+        name: 'instance1',
+        installed: {}
+    },
+    {
+        name: 'instance2',
+        installed: {}
+    },
+    {
+        name: 'instance3',
+        installed: {}
+    },
+    {
+        name: 'instance4',
+        installed: {}
+    }
 ];
 
 const modules = [
-    { name: 'module1', requires: [] },
-    { name: 'module2', requires: ['module1'] },
-    { name: 'module3', requires: ['module1', 'module2'] },
-    { name: 'module4', requires: ['module3'] },
-    { name: 'module5', requires: ['module3', 'module1'] },
-    { name: 'module6', requires: ['module7', 'module1'] },
-    { name: 'module7', requires: ['module8'] },
-    { name: 'module8', requires: ['module6'] }
+    {
+        name: 'module1',
+        requires: []
+    },
+    {
+        name: 'module2',
+        requires: ['module1']
+    },
+    {
+        name: 'module3',
+        requires: ['module1', 'module2']
+    },
+    {
+        name: 'module4',
+        requires: ['module3']
+    },
+    {
+        name: 'module5',
+        requires: ['module3', 'module1']
+    },
+    {
+        name: 'module6',
+        requires: ['module7', 'module1']
+    },
+    {
+        name: 'module7',
+        requires: ['module8']
+    },
+    {
+        name: 'module8',
+        requires: ['module6']
+    }
 ];
 
+// helpers
 const LOOP_ERROR = 'Found dependency loop';
+
 let loggedError;
 let loop = null;
 
@@ -30,6 +71,7 @@ const namedGetter = (array, defaultValue) => query =>
 const getInstance = namedGetter(instances, {});
 const getModule = namedGetter(modules);
 
+// test helpers
 const assertInstanceHasModules = (index, names, message) => {
     const installed = Object.keys(instances[index].installed);
     installed.sort();
@@ -42,7 +84,7 @@ const assertInstanceHasModules = (index, names, message) => {
     }
 };
 
-
+// test class to be proxied
 const ALREADY_INSTALL_ERROR = 'A module was installed twice';
 const MISSING_DEPENDENCY_ERROR = 'A module is installed without its dependencies';
 const WRONG_ERROR_ERROR = 'Should reject on unknown module with error code ERROR_MODULE_UNKNOWN';
@@ -68,7 +110,7 @@ class Instance {
         if (!mod) {
             loggedError = UNKNOWN_DEPENDENCY_ERROR;
             throw UNKNOWN_DEPENDENCY_ERROR;
-        }
+        };
         if (installed[name]) {
             loggedError = ALREADY_INSTALL_ERROR;
             throw ALREADY_INSTALL_ERROR;
@@ -93,9 +135,10 @@ class Instance {
     }
 }
 
+// the final test
 const ProxiedInstance = solution.proxyInstance(Instance, getModule);
 
-const test0 = async () => { 
+const test0 = async () => {
     const instance0 = new ProxiedInstance('instance0');
     if (instance0.name !== 'instance0') {
         return new Error('Instance does not have the right name');
@@ -128,6 +171,7 @@ const test2 = async () => {
 const test3 = async () => {
     const instance3 = new ProxiedInstance('instance3');
     await instance3.installModule('module5');
+
     assertInstanceHasModules(3, ['module1', 'module2', 'module3', 'module5'], 'Missing module or its multiple dependencies');
     console.log('Testing multiple crossed dependencies: OK');
 };
@@ -144,8 +188,7 @@ const test4 = async () => {
                 loggedError = WRONG_ERROR_ERROR;
                 throw new Error('Should reject on unknown module with error code ERROR_MODULE_UNKNOWN');
             }
-        }
-    );
+        });
 
     assertInstanceHasModules(4, [], 'There should be no module on the instance after trying to install an unknown module');
 
@@ -160,23 +203,24 @@ const test4 = async () => {
                 loggedError = WRONG_ERROR_ERROR;
                 throw new Error('Should reject if dependency loop with error code ERROR_MODULE_DEPENDENCIES');
             }
-        }
-    );
+        });
 
     assertInstanceHasModules(4, [], 'There should be no module on the instance after trying to install module with invalid dependencies');
     console.log('Testing reject cases: OK');
 };
 
 
+// run tests
+
 (async () => {
-    try {
+    try  {
         await test0();
         await test1();
         await test2();
         await test3();
         await test4();
     } catch (err) {
-        console.error('Some of the tests are still failing.', err || '');
+        console.error('Some of the tests are still failing.', err || '')
     }
 
     if (loggedError) {

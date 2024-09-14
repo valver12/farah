@@ -52,4 +52,14 @@ function proxyInstance(Instance, getModule) {
   }
   
   module.exports = { proxyInstance };
+  //Lors de mes recherches pour optimiser mon code, j'ai découvert que certaines bibliothèques peuvent considérablement améliorer l'efficacité :
+
+
+  //Axios : Simplifie les appels HTTP pour récupérer des données depuis une API, rendant les requêtes plus claires et faciles à gérer.
+
+//Lodash : Facilite la manipulation des objets et tableaux, rendant le code plus concis, lisible et performant.
+
+//Graphlib : Représente les dépendances en graphe pour éviter les boucles et gérer efficacement les relations complexes entre modules.
+
+//Chalk : Ajoute des couleurs aux messages d'erreurs dans la console, rendant le débogage plus rapide et visuel.
   
